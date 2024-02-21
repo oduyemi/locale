@@ -1,0 +1,9 @@
+__pycache__
+instance/__pycache__
+locale_app/__pycache__
+
+.env
+
+vlocale/
+
+.vscode
