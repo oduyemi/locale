@@ -1,4 +1,5 @@
 import React, { useEffect } from "react"
+import { Footer } from "../../components/Footer";
 import { RegisterForm } from "../../components/Register"
 
 
@@ -12,6 +13,7 @@ const Register = () => {
     return(
         <>
             <RegisterForm />
+            <Footer />
         </>
     )
 }
