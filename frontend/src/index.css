@@ -27,9 +27,12 @@
   margin-top: -20%;
 }
 
-.probootstrap-form{
-  position:relative;
-  z-index: 20;
+.close{
+  position:absolute;
+  top:1%;
+  right:2%;
+  color: #C32F27;
+  font-weight: 600;
 }
 
 

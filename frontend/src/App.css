@@ -40,8 +40,7 @@ body.profile{
 
 
 .App{
-  min-height: 100vh;
-  height: auto; 
+  height: 100vh;
   color: #fff;
 }
 
@@ -69,15 +68,21 @@ body.profile{
   animation: pulse 1.5s ease-in-out infinite;
 }
 
+.modal{
+  z-index: 1000;
+}
 
+.probootstrap-form{
+  position: relative !important;
+  z-index: 1 !important;
+}
 
 footer{
   position: absolute;
   bottom: 0;
   left:32%;
-  z-index: 5;
+  z-index: 1;
 }
-
 
 
 

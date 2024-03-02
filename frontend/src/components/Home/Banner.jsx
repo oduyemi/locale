@@ -1,38 +1,21 @@
-import React, { useState, useEffect} from "react";
+import React, { useState } from "react";
+import Modal from "react-modal";
+import { RegionsPopUp } from "./RegionsPopUp";
 import axios from "axios";
 
 
 
 
+
 export const Banner = () => {
-    const [regions, setRegions] = useState(null);
+    const [regionsPopupOpen, setRegionsPopupOpen] = useState(false);
     const [flashMessage, setFlashMessage] = useState(null);
     const [formSubmitted, setFormSubmitted] = useState(false);
-    const [showPopup, setShowPopup] = useState(false);
     const [data, setData] = useState(null);
     const [formData, setFormData] = useState({
         data: "",
         api_key: "",        
     });
-
-    
-    useEffect(() => {
-        const fetchRegions = async () => {
-          try {
-              const response = await axios.get("http://localhost:8000/regions");
-                  setRegions(response.data);
-  
-              } catch (error) {
-              console.error("Error fetching regions:", error);
-            }
-       };
-  
-        fetchRegions();
-    }, []);
-
-    const handleSeeAllRegions = () => {
-        setShowPopup(true); 
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault(); 
@@ -103,9 +86,18 @@ export const Banner = () => {
             }
     
             setFlashMessage({ type: "error", message: errorMessage });
-        }
-    
+        }   
     }
+
+    //  POP-UP
+    const handleRegionsPopupOpen = () => {
+        setRegionsPopupOpen(true);
+        };
+    
+    const handleRegionsPopupClose = () => {
+    setRegionsPopupOpen(false);
+    };
+    
     return (
         <section className="probootstrap-cover overflow-hidden relative hero mt-0" data-stellar-background-ratio="0.5"  id="section-home">
         <div className="container">
@@ -122,28 +114,34 @@ export const Banner = () => {
                     Click the button below to see all the regions in Nigeria.           
                 </p>
                 <button
-                    onClick={handleSeeAllRegions} 
+                    onClick={handleRegionsPopupOpen}
                     className="btn btn-success p-3 mr-3 pl-5 pr-5 text-uppercase d-lg-inline d-md-inline d-sm-block d-block mb-3">
                         See All Regions
                 </button>  
-                {/* {showPopup && (
-                    <div className="popup">
-                        <div className="popup-content">
-                            <span className="close" onClick={() => setShowPopup(false)}>&times;</span>
-                            <h3>All Regions</h3>
-                            <ul>
-                                {regions && regions.map(region => (
-                                    <li key={region.id}>{region.name}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                )} */}
+                    <Modal
+                        isOpen={regionsPopupOpen}
+                        onRequestClose={handleRegionsPopupClose}
+                        style={{
+                        overlay: {
+                            backgroundColor: "rgba(0, 0, 0, 0.7)",
+                        },
+                        content: {
+                            top: "50%",
+                            left: "50%",
+                            right: "auto",
+                            bottom: "auto",
+                            marginRight: "-50%",
+                            transform: "translate(-50%, -50%)",
+                            background: "white",
+                        },
+                        }}
+                    >
+                    </Modal>
             </div>
              
             <div className="col-md">
                 <form onSubmit={handleSubmit} className="probootstrap-form api">
-                    <h3 className="fw-light text-center text-2xl text-secondary mb-3 animate-pulse">Download Locale Data</h3>
+                    <h3 className="fw-light text-center text-2xl text-light mb-3 animate-pulse">Download Locale Data</h3>
                 <div className="form-group mx-auto">
                     <div className="row mb-3 mx-auto">
                         {flashMessage && (
@@ -153,18 +151,18 @@ export const Banner = () => {
                         )}
                     <div class="col-md-12 mb-3">
                     <div class="form-group">
-                        <label htmlFor="data" style={{ width: "100%"}}>
+                        <label htmlFor="data" style={{ width: "100%"}}>Data Type
                         <select
                             className="form-control"
                             name="data"
-                            style={{ width: "100%" }}
+                            style={{ width: "100%", backgroundColor:"transparent" }}
                             value={formData.data}
                             onChange={(e) => setFormData({ ...formData, data: e.target.value })}
                         >
-                            <option value=""> - Select data -</option>
-                            <option value="regions">Regions</option>
-                            <option value="states">States</option>
-                            <option value="lgas">Local Government Areas</option>
+                            <option value="" style={{ backgroundColor:"transparent"}}> - Select data -</option>
+                            <option value="regions" style={{ backgroundColor:"transparent"}}>Regions</option>
+                            <option value="states" style={{ backgroundColor:"transparent"}}>States</option>
+                            <option value="lgas" style={{ backgroundColor:"transparent"}}>Local Government Areas</option>
                         </select>
                         </label>
 
@@ -172,11 +170,12 @@ export const Banner = () => {
                   </div>
                     <div className="col-md mx-auto">
                         <div className="form-group mx-auto">
-                            <label htmlFor="api_key" style={{ width: "100%" }}>
+                            <label htmlFor="api_key" style={{ width: "100%" }}>API key
                             <input
                                 type="password"
                                 name="api_key"
                                 className="form-control"
+                                style={{ backgroundColor:"transparent"}}
                                 value={formData.api_key}
                                 onChange={(e) => setFormData({ ...formData, api_key: e.target.value })}
                             />
@@ -190,6 +189,7 @@ export const Banner = () => {
                 </div>
             </form>
             </div></div></div>
+            <RegionsPopUp open={regionsPopupOpen} onClose={handleRegionsPopupClose} />
         </section>
     )
 }

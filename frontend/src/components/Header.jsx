@@ -59,14 +59,15 @@ export const Header = () => {
                     <div className="ml-auto">
                     {user ? (
                             <div className="cta">
+                                <p className="mt-5 d-inline">{user && user.fname} {user && user.lname}</p>&emsp;<span>
                                 <Link to="/profile">
                                     <PersonOutline
                                         color={"#ffffff"}
-                                        height="32px"
-                                        width="32px"
+                                        height="20px"
+                                        width="20px"
                                     />
-                                </Link> {" "}
-                                <LogOut /> 
+                                </Link> &emsp;
+                                <LogOut /> </span>
                             </div>
                         ) : (
                         <Link className="nav-link" to="/login">

@@ -10,8 +10,8 @@ export const LogOut = () => {
   return (
     <LogOutSharp
         color={"#ffffff"}
-        height="32px"
-        width="32px"
+        height="20px"
+        width="20px"
         onClick={handleLogout}
     />
   );

@@ -1,6 +1,8 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { UserContext } from "../../UserContext"
 import { SearchCircleOutline } from "react-ionicons";
 import axios from "axios";
+
 
 
 
@@ -11,7 +13,7 @@ export const DashboardContent = () => {
     const [flashMessage, setFlashMessage] = useState(null);
     const [regionSearch, setRegionSearch] = useState('');
     const [stateSearch, setStateSearch] = useState('');
-
+    const { user } = useContext(UserContext);
 
     useEffect(() => {
       const fetchRegions = async () => {
@@ -98,7 +100,7 @@ const handleStateSearch = async () => {
 
   return(
     <div className="container pt-5">
-      <h5 className="mt-5">Hello User First name</h5>
+      <h5 className="mt-5">Hello {user && user.fname},</h5>
       <div className="row mt-5">
         <div className="col-sm-4 py-2"  >
           <div className="card card-body bg-transparent shadow">
