@@ -33,6 +33,11 @@ body.guide{
   background-size: cover;
 }
 
+body.profile{
+  background-image: url(assets/images/profile.jpg);
+  background-size: cover;
+}
+
 
 .App{
   min-height: 100vh;
@@ -70,6 +75,7 @@ footer{
   position: absolute;
   bottom: 0;
   left:32%;
+  z-index: 5;
 }
 
 

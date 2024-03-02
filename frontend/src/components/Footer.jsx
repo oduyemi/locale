@@ -19,7 +19,7 @@ export const Footer = () => {
                     </li>
                     <li style={{ listStyleType: "none"}}>
                         <Link to="/guide" className="me-4 text-sm text-secondary me-md-6" style={{ textDecoration: "none"}}>
-                            Guides
+                            Urban City Guides
                         </Link>
                     </li>
                 </ul>

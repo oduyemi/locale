@@ -1,15 +1,16 @@
 import os, time, bcrypt, hashlib, logging, requests
 from datetime import datetime
-from fastapi import APIRouter, Request, status, Depends, HTTPException, Form
+from fastapi import APIRouter, Request, status, Depends, HTTPException, Path
 from fastapi.responses import JSONResponse
 from sqlalchemy import or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from locale_app import starter, models, schemas
+from passlib.context import CryptContext
 from typing import Optional, List
-from locale_app.models import User, Region, State, LGA
-from locale_app.schemas import UserResponse, Token, UserRequest
+from locale_app.models import Users, Region, State, LGA, City
+from locale_app.schemas import RegionDetail, StateDetail, UserResponse, RegistrationRequest, LoginRequest
 from locale_app.database import SessionLocal
-from .authorize import create_access_token, verify_token, authenticate_user
+from .auth import create_access_token, verify_token, authenticate_user
 from locale_app.dependencies import get_db, get_user_from_session, get_current_user, create_jwt_token, get_token
 from .dependencies import get_db
 from instance.config import SECRET_KEY, DATABASE_URI
@@ -27,67 +28,17 @@ GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 logger = logging.getLogger(__name__)
 
 
-
-def fetch_data_from_google_maps_api():
-    url = "https://maps.googleapis.com/maps/api/geocode/json"
-    params = {
-        "address": "Nigeria",
-        "key": GOOGLE_MAPS_API_KEY
-    }
-    response = requests.get(url, params=params)
-    response.raise_for_status()
-    
-    # Print or log the response content
-    print(response.json())
-
-    return response.json().get("results", [])
-
-fetch_data_from_google_maps_api()
+def hash_password(pwd: str) -> str:
+    salt = bcrypt.gensalt()
+    hashed_pwd = bcrypt.hashpw(pwd.encode('utf-8'), salt)
+    return hashed_pwd.decode('utf-8')
 
 
-
-def process_and_store_data():
-    regions, states, lgas = fetch_data_from_google_maps_api()
-    session = SessionLocal()
-
-    try:
-        #  regions
-        for region_name in regions:
-            region = Region(name=region_name)
-            session.add(region)
-
-        #  states
-        for state_name in states:
-            state = State(name=state_name)
-            session.add(state)
-
-        #  LGAs
-        for lga_name in lgas:
-            lga = LGA(name=lga_name)
-            session.add(lga)
-
-        session.commit()
-        print("Data successfully stored in the database.")
-
-    except Exception as e:
-        session.rollback()
-        print(f"Error storing data in the database: {e}")
-
-    finally:
-        session.close()
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def refresh_data_periodically():
-    while True:
-        try:
-            process_and_store_data()
-            print(f"Data refreshed at {datetime.now()}")
-        except Exception as e:
-            print(f"Error refreshing data: {e}")
-
-        time.sleep(604800)
-
-# refresh_data_periodically()
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 
@@ -96,229 +47,337 @@ def refresh_data_periodically():
 
 @starter.get("/")
 async def get_index():
-    """Get the index message."""
-    return {"message": "Locale API!"}
+    try:
+        return {"message": "Locale API!"}
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
 
 @starter.get("/users", response_model=List[schemas.UserResponse])
 async def get_users(db: Session = Depends(get_db)):
-    """
-    Get all users.
+    try:
+        users = db.query(Users).all()
 
-    Returns:
-    - regions (dict): Dictionary containing regions or a single region.
-    """
-    users = db.query(User).all()
+        if not users:
+            raise HTTPException(status_code=404, detail="Users not available!")
 
-    if not users:
-        raise HTTPException(status_code=404, detail="Users not available!")
+        user_responses = [
+            UserResponse(
+                id = user.id,
+                fname = user.fname,
+                lname = user.lname,
+                email = user.email,
+            )
+            for user in users
+        ]
 
-    user_responses = [
-        UserResponse(
-            id = user.id,
-            fname = user.fname,
-            lname = user.lname,
-            email = user.email,
-            hashed_pwd = user.hashed_pwd,
-        )
-        for user in users
-    ]
-
-    return user_responses
+        return user_responses
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
 
 
 @starter.get("/users/{id}", response_model=schemas.UserResponse)
 async def get_user(id: int, db: Session = Depends(get_db)):
-    """
-    Get a specific user by ID.
+    try:
+        user = db.query(Users).filter(Users.id == id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not available!")
 
-    Parameters:
-    - user_id (int, optional): ID of the user to retrieve.
+        user_response = schemas.UserResponse(
+            id = user.id,
+            fname = user.fname,
+            lname = user.lname,
+            email = user.email,
+            hashedpwd = user.hashedPwd
+        )
 
-    Returns:
-    - A single user.
-    """
-    user = db.query(User).filter(User.id == id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not available!")
+        return user_response
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
 
-    user_response = schemas.UserResponse(
-        id = user.id,
-        fname = user.fname,
-        lname = user.lname,
-        email = user.email,
-        hashed_pwd = user.hashed_pwd
-    )
+@starter.put("/users/{id}", response_model=schemas.UserResponse)
+async def edit_profile(id: int, user_data: schemas.UpdateRequest, db: Session = Depends(get_db)):
+    try:
+        user = db.query(Users).filter(Users.id == id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not available!")
 
-    return user_response
+        if user_data.fname:
+            user.fname = user_data.fname
+        if user_data.lname:
+            user.lname = user_data.lname
+        if user_data.email:
+            user.email = user_data.email
+
+        db.commit()
+
+        return schemas.UserResponse(
+            id=user.id,
+            fname=user.fname,
+            lname=user.lname,
+            email=user.email,
+        )
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
 
 
-@starter.get("/api-key")
-async def get_api_key(user: models.User = Depends(get_current_user)):
-    """
-    Get the API key for the currently logged-in user.
-    """
-    if user.api_key:
+@starter.get("/api-key/{api_key}")
+async def get_api_key(api_key: str = Path(...), db: Session = Depends(get_db)):
+    try:
+        print(f"Received API key: {api_key}")
+        user = db.query(Users).filter(Users.api_key == api_key).first()
+  
+        if not user:
+            raise HTTPException(status_code=404, detail="Incorrect API key. Sign up to generate API key")
+
         return {"api_key": user.api_key}
-    else:
-        raise HTTPException(status_code=404, detail="API key not found")
+
+    except Exception as e:
+        print(f"Error: {e}")
+        raise
 
 
-@locale_router.get("/regions")
-async def get_regions(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    """
-    Get all regions.
+@starter.post("/api-key/{api_key}")
+async def api(api_key: str = Path(...), db: Session = Depends(get_db)):
+    try:
+        print(f"Received API key: {api_key}")
+        user = db.query(Users).filter(Users.api_key == api_key).first()
+  
+        if not user:
+            raise HTTPException(status_code=404, detail="Invalid API key. Register to generate API key")
 
-    Returns:
-    - All regions.
-    """
-    regions = db.query(Region).all()
-    return regions
+        return {"api_key": user.api_key}
 
-
-@locale_router.get("/regions/{region_id}")
-async def get_region(region_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    """
-    Get a specific region by ID.
-
-    Parameters:
-    - region_id (int): ID of the region to retrieve.
-
-    Returns:
-    - region (dict): Dictionary containing the region.
-    """
-    region = db.query(Region).filter(Region.id == region_id).first()
-    if not region:
-        raise HTTPException(status_code=404, detail="Region not found")
-    return region
-
-@locale_router.get("/states")
-async def get_states(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    """
-    Get all states.
-
-    Returns:
-    - All states.
-    """
-    states = db.query(State).all()
-    return states
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
 
 
-@locale_router.get("/states/{state_id}")
-async def get_state(state_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    """
-    Get a specific state by ID.
+@starter.get("/regions")
+async def get_regions(db: Session = Depends(get_db)):
+    try:
+        regions = db.query(Region).all()
+        return regions
 
-    Parameters:
-    - state_id (int): ID of the state to retrieve.
-
-    Returns:
-    - state (dict): Dictionary containing the state.
-    """
-    state = db.query(State).filter(State.id == state_id).first()
-    if not state:
-        raise HTTPException(status_code=404, detail="State not found")
-    return state
-
-@locale_router.get("/lgas")
-async def get_lgas(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    """
-    Get all LGAs.
-
-    Returns:
-    - All LGAs.
-    """
-    lgas = db.query(LGA).all()
-    return lgas
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
 
 
-@locale_router.get("/lgas/{lga_id}")
-async def get_lga(lga_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    """
-    Get a specific LGA by ID.
 
-    Parameters:
-    - lga_id (int): ID of the LGA to retrieve.
+@starter.get("/regions/{region_id}", response_model=RegionDetail)
+async def get_region(region_id: int, db: Session = Depends(get_db)):
+    try:
+        region = db.query(Region).filter(Region.region_id == region_id).first()
+        if not region:
+            raise HTTPException(status_code=404, detail="Region not found")
 
-    Returns:
-    - lga (dict): Dictionary containing the LGA.
-    """
-    lga = db.query(LGA).filter(LGA.id == lga_id).first()
-    if not lga:
-        raise HTTPException(status_code=404, detail="LGA not found")
-    return lga
+        state_names = [state.state_name for state in region.states]
+        cities = [city.city_name for city in region.cities]
+
+        return {
+            "region_id": region.region_id, 
+            "region_name":region.region_name, 
+            "state_names": state_names, 
+            "cities": cities
+            }
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+
+@starter.get("/states")
+async def get_states(db: Session = Depends(get_db)):
+    try:
+        states = db.query(State).all()
+        return states
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+
+
+@starter.get("/states/{state_id}", response_model=StateDetail)
+async def get_state(state_id: int, db: Session = Depends(get_db)):
+    try:
+        state = (
+            db.query(models.State)
+            .join(models.Region)
+            .join(models.LGA)
+            .filter(models.State.state_id == state_id)
+            .first()
+        )
+        if not state:
+            raise HTTPException(status_code=404, detail="State not found")
+        
+        return StateDetail(
+            state_id=state.state_id,
+            state_name=state.state_name,
+            region_name=state.region.region_name,
+            lgas=[lga.lga_name for lga in state.lgas],
+            cities=[city.city_name for city in state.cities]
+        )
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+
+@starter.get("/lgas")
+async def get_lgas(db: Session = Depends(get_db)):
+    try:
+        lgas = db.query(LGA).all()
+        return lgas
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+
+
+@starter.get("/lgas/{lga_id}")
+async def get_lga(lga_id: int, db: Session = Depends(get_db), user: Users = Depends(get_current_user)):
+    try:
+        lga = db.query(LGA).filter(LGA.lga_id == lga_id).first()
+        if not lga:
+            raise HTTPException(status_code=404, detail="LGA not found")
+        return lga
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+
+
+@starter.get("/cities")
+async def get_cities(db: Session = Depends(get_db)):
+    try:
+        cities = (
+            db.query(City)
+            .options(joinedload(City.state)) 
+            .all()
+        )
+
+        cities_data = []
+        for city in cities:
+            city_data = {
+                "city_id": city.city_id,
+                "city_name": city.city_name,
+                "city_state_name": city.state.state_name, 
+                "city_population": city.city_population,
+                "city_area": city.city_area,
+                "city_density": city.city_density
+            }
+            cities_data.append(city_data)
+
+        return cities_data
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+
+
+@starter.get("/cities/{city_id}")
+async def get_city(city_id: int, db: Session = Depends(get_db)):
+    try:
+        city = db.query(City).get(city_id)
+        if not city:
+            raise HTTPException(status_code=404, detail="City not found")
+
+        city_data = {
+            "city_id": city.city_id,
+            "city_name": city.city_name,
+            "city_state_name": city.state.state_name, 
+            "city_population": city.city_population,
+            "city_area": city.city_area,
+            "city_density": city.city_density
+        }
+
+        return city_data
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
 
 
 @starter.post("/register")
-async def register_user(
-    first_name: str = Form(...),
-    last_name: str = Form(...),
-    email: str = Form(...),
-    pwd: str = Form(...),
-    c_pwd: str = Form(...),
-    db: Session = Depends(get_db)
-):
-    if pwd != c_pwd:
-        raise HTTPException(status_code=400, detail="Passwords do not match")
-
-    existing_user = db.query(models.User).filter(models.User.email == email).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email is already taken")
-
-    api_key = generate_api_key()
-
-    hashed_pwd = bcrypt.hashpw(pwd.encode('utf-8'), bcrypt.gensalt())
-
-    new_user = models.User(
-        fname = first_name,
-        lname = last_name,
-        email = email,
-        hashed_pwd = hashed_pwd,
-        api_key = api_key
-    )
-
+async def register_user(user_request: RegistrationRequest, db: Session = Depends(get_db)):
     try:
+        if user_request.pwd != user_request.cpwd:
+            raise HTTPException(status_code=400, detail="Passwords must match!")
+
+        if not all([user_request.fname, user_request.lname, user_request.email, user_request.pwd, user_request.cpwd]):
+            raise HTTPException(status_code=400, detail="All fields are required")
+
+        existing_user = db.query(Users).filter(Users.email == user_request.email).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email is not available. Use another email address")
+
+        hashedpwd = hash_password(user_request.pwd)
+
+        new_user = Users(
+            fname=user_request.fname,
+            lname=user_request.lname,
+            email=user_request.email,
+            hashedpwd=hashedpwd,
+            api_key=generate_api_key()
+        )
+
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
 
+        token = create_access_token({"sub": new_user.email})
+
         return {
-            "user_fname": new_user.fname,
-            "user_lname": new_user.lname,
-            "user_email": new_user.email,
-            "api_key": new_user.api_key
+            "fname": new_user.fname,
+            "lname": new_user.lname,
+            "email": new_user.email,
+            "token": token
         }
 
     except Exception as e:
+        print(f"Error: {e}")
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+        raise
 
 
 @starter.post("/login")
-async def login_user(
-    email: str = Form("mail"),
-    pwd: str = Form("pwd"),
-    db: Session = Depends(get_db)
-    ):
-    print(f"Received email: {email}, password: {pwd}")
+async def login_user(user_request: LoginRequest, db: Session = Depends(get_db)):
+    try:
+        if not all([user_request.email, user_request.pwd]):
+            raise HTTPException(status_code=400, detail="All fields are required!")
 
-    if not all([email, pwd]):
-        raise HTTPException(status_code=400, detail="All fields are required")
+        user = db.query(Users).filter(Users.email == user_request.email).first()
+        if not user or not verify_password(user_request.pwd, user.hashedpwd):
+            raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-    user = db.query(models.User).filter(models.User.email == email).first()
-    if not user or not verify_password(pwd, user.hashed_pwd):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        access_token = create_access_token(data={"sub": user.email})
+        print(f"Access Token: {access_token}")
 
-    access_token = create_access_token(data={"sub": user.email})
-    print(f"Generated access_token: {access_token}")
-
-    return JSONResponse(content={"access_token": access_token, "token_type": "bearer"})
+        return JSONResponse(content={
+            "access_token": access_token, "token_type": "bearer",
+            "user": {
+                "id": user.id,
+                "fname": user.fname,
+                "lname": user.lname,
+                "email": user.email,
+                "api_key": user.api_key
+            }
+        })
+            
+    except Exception as e:
+        print(f"Error: {e}")
+        raise
 
 
 @starter.post("/logout")
 async def logout_user(token: str = Depends(get_token)):
-    user_id = get_user_from_session(token)
-    if user_id:
-        remove_user_from_session(user_id)
-        return {"message": "Logout successful"}
-    else:
-        raise HTTPException(status_code=401, detail="User not in session")
+    try:
+        user_id = get_user_from_session(token)
+        if user_id:
+            remove_user_from_session(user_id)
+            return {"message": "Logout successful"}
+        else:
+            raise HTTPException(status_code=401, detail="User not in session")
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise

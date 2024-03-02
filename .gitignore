@@ -7,7 +7,7 @@ __pycache__
 backend/.env
 /frontend/.env
 
-backend/vlocale/
+backend/vocale/
 
 .vscode
 /frontend/.vscode

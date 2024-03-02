@@ -1,4 +1,5 @@
 import React, { useEffect } from "react"
+import { DashboardContent } from "../../components/Dashboard";
 import { Footer } from "../../components/Footer";
 
 
@@ -11,6 +12,7 @@ const Dashboard = () => {
       }, []);
     return(
         <>
+        <DashboardContent />
         <Footer />
         </>
     )

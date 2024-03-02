@@ -14,47 +14,65 @@ Base = declarative_base()
 
 
 
-class User(Base):
-    __tablename__ = "user"
+class Users(Base):
+    __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     fname = Column(String(250), index=True)
     lname = Column(String(250), index=True)
-    email = Column(String(150), index=True)
-    pwd = Column(String(120), index=True)
-    hashed_pwd = Column(String(120), index=True)
+    email = Column(String(150), index=True, unique=True)
+    hashedpwd = Column(String(255), index=True)
+    api_key = Column(String(255), index=True)
+
+
 
 class Region(Base):
     __tablename__ = "region"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(255), index=True, nullable=False)
+    region_id = Column(Integer, primary_key=True, index=True)
+    region_name = Column(String(255), index=True, nullable=False)
+    region_states = Column(String(255), index=True, nullable=False)
 
     # Relationship
     states = relationship("State", back_populates="region")
+    cities = relationship("City", back_populates="region")  
+
 
 class State(Base):
     __tablename__ = "state"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(250), index=True, nullable=False)
-    region_id = Column(Integer, ForeignKey("region.id"), nullable=False)
+    state_id = Column(Integer, primary_key=True, index=True)
+    state_name = Column(String(250), index=True, nullable=False)
+    state_capital = Column(String(250), index=True, nullable=False)
+    state_largest_city = Column(String(250), index=True, nullable=False)
+    state_area = Column(String(250), index=True, nullable=False)
+    state_population = Column(String(250), index=True, nullable=False)
+    state_region_id = Column(Integer, ForeignKey("region.region_id"), nullable=False)
 
     # Relationships
     region = relationship("Region", back_populates="states")  
-    lgas = relationship("LGA", back_populates="state")  
+    lgas = relationship("LGA", back_populates="state")
+    cities = relationship("City", back_populates="state")
+
 
 class LGA(Base):
     __tablename__ = "lga"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(250), index=True)
-    state_id = Column(Integer, ForeignKey("state.id"), nullable=False)
+    lga_id = Column(Integer, primary_key=True, index=True)
+    lga_name = Column(String(250), index=True)
+    lga_stateid = Column(Integer, ForeignKey("state.state_id"), nullable=False)
 
     # Relationship
     state = relationship("State", back_populates="lgas") 
 
-class APIKey(Base):
-    __tablename__ = "api_key"
-    id = Column(Integer, primary_key=True, index=True)
-    key = Column(String(255), index=True, nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+class City(Base):
+    __tablename__ = "city"
+    city_id = Column(Integer, primary_key=True, index=True)
+    city_name = Column(String(250), index=True)
+    city_population = Column(String(250), index=True, nullable=False)
+    city_area = Column(String(250), index=True, nullable=False)
+    city_density = Column(String(250), index=True, nullable=False)
 
-    # Relationship
-    user = relationship("User", back_populates="api_keys")
+    city_state_id = Column(Integer, ForeignKey("state.state_id"), nullable=False)
+    city_region_id = Column(Integer, ForeignKey("region.region_id"), nullable=False)
+
+    # Relationships
+    state = relationship("State", back_populates="cities")
+    region = relationship("Region", back_populates="cities") 
+
