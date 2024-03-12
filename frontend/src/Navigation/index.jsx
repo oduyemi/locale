@@ -8,6 +8,7 @@ import Register from "../pages/Register";
 import Logout from "../pages/Logout";
 import CityGuide from "../pages/CityGuide";
 import Profile from "../pages/Profile";
+import API from "../pages/API";
 
 
 
@@ -23,7 +24,7 @@ const Navigation = () => {
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
-                        <Route path="/logout" element={<Logout />} />
+                        <Route path="/api" element={<API />} />
                         
                         
                     </Routes>

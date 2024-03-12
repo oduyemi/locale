@@ -25,8 +25,8 @@ export const City = () => {
 
     return (
         <div className="container bg-transparent"> 
-            <h2 className="my-5 pt-5 animate-pulse">Urban Cities</h2>  
-            <div className="city-table table-responsive custom-table-responsive bg-transparent shadow shadow-5">
+            <h2 className="mt-5 pt-5">Urban Cities</h2>  
+            <div className="city-table table-responsive custom-table-responsive bg-transparent shadow">
                 <table className="table custom-table">
                     <thead>
                         <tr>  

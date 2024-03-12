@@ -6,11 +6,11 @@ import { Link } from "react-router-dom";
 
 export const LoginForm = () => {
     const { handleLogin, flashMessage } = useContext(UserContext);
+    const [formSubmitted, setFormSubmitted] = useState(false);
     const [formData, setFormData] = useState({
         email: "",
         pwd: "",
     });
-    const [formSubmitted, setFormSubmitted] = useState(false);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,7 +19,11 @@ export const LoginForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormSubmitted(true); 
-        handleLogin(formData.email, formData.pwd)
+        const success = await handleLogin(formData.email, formData.pwd);
+        if (success) {
+            const requestedPath = localStorage.getItem("requestedPath");
+            window.location.href = requestedPath ? requestedPath : "/dashboard";
+          }
     };
 
     console.log("flashMessage:", flashMessage); 
@@ -42,7 +46,7 @@ export const LoginForm = () => {
                                     <input 
                                         type="email" 
                                         name="email" 
-                                        className="form-control" 
+                                        className="form-control bg-transparent disabled placeholder" 
                                         placeholder="Your Email Address"
                                         value={formData.email}
                                         onChange={handleChange}
@@ -59,7 +63,7 @@ export const LoginForm = () => {
                                 <input 
                                     type="password" 
                                     name="pwd" 
-                                    className="form-control" 
+                                    className="form-control bg-transparent diasbled placeholder" 
                                     placeholder="Your Password" 
                                     value={formData.pwd}
                                     onChange={handleChange}
@@ -76,8 +80,8 @@ export const LoginForm = () => {
                         <input type="submit" value="Login" className="btn btn-success btn-block" />
                     </div>
                     <div class="text-center my-3">
-                        <span class="text-success" style={{ fontSize: "smaller"}}>Don't have an account yet? &nbsp;
-                            <Link class="text-danger" to="/register" style={{ textDecoration: "none" }}>Click Here</Link>
+                        <span class="text-light" style={{ fontSize: "smaller"}}>Don't have an account yet? &nbsp;
+                            <Link class="text-warning" to="/register" style={{ textDecoration: "none" }}>Click Here</Link>
                         </span>
                     </div>
             </form></div>

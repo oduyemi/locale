@@ -35,6 +35,10 @@
   font-weight: 600;
 }
 
+.form-control::placeholder {
+  color: #fff !important;
+}
+
 
 @media (max-width: 768px) {
   .mobile-menu-button {

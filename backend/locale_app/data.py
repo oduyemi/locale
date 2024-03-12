@@ -6,7 +6,7 @@ def populate_database():
     session = SessionLocal()
     try:
         nigeria_regions = [
-        Region(region_name="North Central", region_states=["Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau", "Abuja (FCT"]),
+        Region(region_name="North Central", region_states=["Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau", "Abuja (FCT)"]),
         Region(region_name="North East", region_states=["Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"]),
         Region(region_name="North West", region_states=["Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto", "Zamfara"]),
         Region(region_name="South South", region_states=["Abia", "Anambra", "Ebonyi", "Enugu", "Imo"]),
@@ -878,7 +878,7 @@ def populate_database():
             City(city_name="Zaria", city_population="695,089", city_area="562 km²", city_density="1,234.6/km²", city_state_id=18, city_region_id=3),
             City(city_name="Aba", city_population="1,215,000", city_area="901 km²", city_density="13,400", city_state_id=1, city_region_id=4),
             City(city_name="Ilorin",city_population="890,000", city_area="83 km²", city_density="10,700/km²",  city_state_id=23, city_region_id=4),
-            City(city_name="Jos", city_population="790,000", city_area="70 km²", city_density="11,300/km²", city_state_id=1, city_region_id=1),
+            City(city_name="Jos", city_population="790,000", city_area="70 km²", city_density="11,300/km²", city_state_id=31, city_region_id=1),
 
         ]
 

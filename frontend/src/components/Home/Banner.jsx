@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-import { RegionsPopUp } from "./RegionsPopUp";
+import { RegionsPopUp } from "../Popups.jsx/RegionsPopup";
 import axios from "axios";
 
 
@@ -38,19 +38,19 @@ export const Banner = () => {
                 const response = await axios.get("http://localhost:8000/regions");
                 setData(response.data);
                 filename = "regions.json";
-                url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)], { type: 'application/json' }));
+                url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)], { type: "application/json" }));
     
             } else if (formData.data === "states") {
                 const response = await axios.get("http://localhost:8000/states");
                 setData(response.data);
                 filename = "states.json";
-                url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)], { type: 'application/json' }));
+                url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)], { type: "application/json" }));
     
             } else if (formData.data === "lgas") {
                 const response = await axios.get("http://localhost:8000/lgas");
                 setData(response.data);
                 filename = "lgas.json";
-                url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)], { type: 'application/json' }));
+                url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)], { type: "application/json" }));
     
             } else {
                 setFlashMessage({
@@ -60,9 +60,9 @@ export const Banner = () => {
                 return;
             }
     
-            const link = document.createElement('a');
+            const link = document.createElement("a");
             link.href = url;
-            link.setAttribute('download', filename);
+            link.setAttribute("download", filename);
             document.body.appendChild(link);
             link.click();
     
@@ -183,7 +183,7 @@ export const Banner = () => {
                         </div>
                     </div>
                     <div className="col-md">
-                        <input type="submit" value="Download JSON File" className="btn btn-success btn-block" />
+                        <input type="submit" value="Download JSON File" className="btn btn-success btn-block mt-3" />
                     </div>
                     </div>
                 </div>

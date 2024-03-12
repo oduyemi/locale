@@ -168,7 +168,6 @@ async def get_regions(db: Session = Depends(get_db)):
         raise
 
 
-
 @starter.get("/regions/{region_id}", response_model=RegionDetail)
 async def get_region(region_id: int, db: Session = Depends(get_db)):
     try:
@@ -189,6 +188,30 @@ async def get_region(region_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Error: {e}")
         raise
+
+
+@starter.get("/regions/region/{regionSearch}", response_model=RegionDetail)
+async def get_region_by_name(regionSearch: str, db: Session = Depends(get_db)):
+    try:
+        name = regionSearch.capitalize()
+        print(f"Region Name Received: {name}")
+        region = db.query(models.Region).filter(models.Region.region_name == name).first()
+        if region:
+            return RegionDetail(
+                region_id=region.region_id,
+                region_name=region.region_name,
+                state_names=[state.state_name for state in region.states],
+                cities=[city.city_name for city in region.cities]
+            )
+
+        else:
+            raise HTTPException(status_code=404, detail="The region does not exist.")
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+
+
 
 @starter.get("/states")
 async def get_states(db: Session = Depends(get_db)):
@@ -224,6 +247,32 @@ async def get_state(state_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Error: {e}")
         raise
+
+
+@starter.get("/states/state/{stateSearch}", response_model=StateDetail)
+async def get_state_by_name(stateSearch: str, db: Session = Depends(get_db)):
+    try:
+        name = stateSearch.capitalize()
+        print(f"State Name Received: {name}")
+        state = db.query(models.State).filter(models.State.state_name == name).first()
+
+        if state:
+            return StateDetail(
+                state_id=state.state_id,
+                state_name=state.state_name,
+                region_name=state.region.region_name,
+                lgas=[lga.lga_name for lga in state.lgas],
+                cities=[city.city_name for city in state.cities]
+            )
+
+        else:
+            raise HTTPException(status_code=404, detail="The state does not exist.")
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+
+
 
 @starter.get("/lgas")
 async def get_lgas(db: Session = Depends(get_db)):

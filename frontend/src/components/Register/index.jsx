@@ -1,10 +1,15 @@
 import React, { useState } from "react";
+import { CopyOutline } from "react-ionicons";
 import { Link } from "react-router-dom";
 import axios from "axios"
 
 
 
 export const RegisterForm = () => {
+    const [apiKey, setApiKey] = useState(""); 
+    const [copied, setCopied] = useState(false);
+    const [flashMessage, setFlashMessage] = useState(null);
+    const [formSubmitted, setFormSubmitted] = useState(false);
     const [formData, setFormData] = useState({
         fname: "",
         lname: "",
@@ -12,8 +17,7 @@ export const RegisterForm = () => {
         pwd: "",
         cpwd: ""
     });
-    const [flashMessage, setFlashMessage] = useState(null);
-    const [formSubmitted, setFormSubmitted] = useState(false);
+    
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,11 +36,13 @@ export const RegisterForm = () => {
     
             console.log(response.data);
     
+            setApiKey(response.data.api_key); 
+
             setFlashMessage({
                 type: "success",
-                message: "Registration successful. An account has been created for you.",
+                message: "Registration successful! An account has been created for you. Copy your API key below.",
             });
-    
+
             setFormSubmitted(true);
     
             setTimeout(() => {
@@ -58,13 +64,40 @@ export const RegisterForm = () => {
             setFlashMessage({ type: "error", message: errorMessage });
         }
     };
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(apiKey);
+        setCopied(true);
+    };
+
     return(
         <div className="row mt-5">
             <div className="col-md mt-3">
                 <form onSubmit={handleSubmit} className="probootstrap-form w-50 mx-auto mt-5">
                     {formSubmitted && (
-                        <div className={`alert ${flashMessage?.type === "success" ? "alert-success" : "alert-danger"}`}>
-                            {flashMessage?.message}
+                        <div>
+                            <div className={`alert ${flashMessage?.type === "success" ? "alert-success" : "alert-danger"}`}>
+                                {flashMessage?.message}
+                            </div>
+                            {apiKey && (
+                                <div className="mx-auto mb-5">
+                                    <h4 className="text-3xl fw-bold mb-3">
+                                        API Key
+                                    </h4>
+                                    <p className="my-3">
+                                        {apiKey}
+                                        &emsp;
+                                        <span onClick={copyToClipboard} style={{ cursor: "pointer" }}>
+                                            <CopyOutline
+                                                color={"#023047"}
+                                                height="20px"
+                                                width="20px"
+                                            />
+                                        </span>
+                                    </p>
+                                    {copied && <p className="text-warning">Copied!</p>}
+                                </div>
+                            )}
                         </div>
                     )}
                 <h2 className="text-center display-5 text-success mt-2">Registration</h2>
@@ -77,7 +110,7 @@ export const RegisterForm = () => {
                             <input 
                                 type="text" 
                                 name="fname" 
-                                className="form-control" 
+                                className="form-control bg-transparent disabled placeholder" 
                                 placeholder="Your First Name" 
                                 value={formData.fname} 
                                 onChange={handleChange} 
@@ -92,7 +125,7 @@ export const RegisterForm = () => {
                             <input 
                                 type="text" 
                                 name="lname" 
-                                className="form-control" 
+                                className="form-control bg-transparent disabled placeholder" 
                                 placeholder="Your Last Name"
                                 value={formData.lname} 
                                 onChange={handleChange}
@@ -110,7 +143,7 @@ export const RegisterForm = () => {
                                 <input 
                                     type="email" 
                                     name="email" 
-                                    className="form-control" 
+                                    className="form-control bg-transparent disabled placeholder" 
                                     placeholder="Your Email Address"
                                     value={formData.email}
                                     onChange={handleChange}
@@ -127,7 +160,8 @@ export const RegisterForm = () => {
                         <div className="">
                             <input 
                                 type="password" 
-                                name="pwd" className="form-control" 
+                                name="pwd"
+                                className="form-control bg-transparent disabled placeholder" 
                                 placeholder="Create Your Password" 
                                 value={formData.pwd}
                                 onChange={handleChange}
@@ -142,7 +176,7 @@ export const RegisterForm = () => {
                             <input 
                                 type="password" 
                                 name="cpwd" 
-                                className="form-control" 
+                                className="form-control bg-transparent text-light disabled placeholder" 
                                 placeholder="Confirm The Password"
                                 value={formData.cpwd}
                                 onChange={handleChange}
@@ -155,8 +189,8 @@ export const RegisterForm = () => {
                         <input type="submit" value="Register" className="btn btn-success btn-block" />
                     </div>
                     <div class="text-center my-3">
-                        <span class="text-success" style={{ fontSize: "smaller" }}>Already Have An Account? &nbsp; 
-                            <Link class="text-danger" to="/login" style={{ textDecoration: "none" }}>Click Here</Link>
+                        <span class="text-light" style={{ fontSize: "smaller" }}>Already Have An Account? &nbsp; 
+                            <Link class="text-warning" to="/login" style={{ textDecoration: "none" }}>Click Here</Link>
                         </span>
                     </div>
             </form></div>

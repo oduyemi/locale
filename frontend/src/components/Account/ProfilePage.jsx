@@ -19,21 +19,29 @@ export const ProfilePage = () => {
     });
    
     useEffect(() => {
-        if (user) {
+        let requestedPath = "/profile";
+        if (!user) {
+            setFlashMessage({
+                type: "error",
+                message: "You need to login first!",
+            });
+            localStorage.setItem("requestedPath", requestedPath)
+            window.location.href="/login";
+        } else {
             setUserDetails({
                 fname: user.fname || "",
                 lname: user.lname || "",
                 email: user.email || ""
             });
-        }
-    }, [user]);
+            }
+        }, [user]);
 
-    useEffect(() => {
-        const storedUserDetails = JSON.parse(localStorage.getItem('userDetails'));
-        if (storedUserDetails) {
-            setUserDetails(storedUserDetails);
-        }
-    }, []);
+        useEffect(() => {
+            const storedUserDetails = JSON.parse(localStorage.getItem('userDetails'));
+            if (storedUserDetails) {
+                setUserDetails(storedUserDetails);
+            }
+        }, []);
 
     const updateUserData = async () => {
         try {

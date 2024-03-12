@@ -38,6 +38,11 @@ body.profile{
   background-size: cover;
 }
 
+body.key{
+  background-image: url(assets/images/key.jpg);
+  background-position-y: 30%;
+  background-size: cover;
+}
 
 .App{
   height: 100vh;
