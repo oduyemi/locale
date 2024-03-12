@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request, status, Depends, HTTPException, Path
 from fastapi.responses import JSONResponse
 from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
+from cachetools import TTLCache, cached
 from locale_app import starter, models, schemas
 from passlib.context import CryptContext
 from typing import Optional, List
@@ -22,9 +23,7 @@ load_dotenv()
 
 
 locale_router = APIRouter()
-
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-
+cache = TTLCache(maxsize=100, ttl=300)
 logger = logging.getLogger(__name__)
 
 
@@ -55,6 +54,7 @@ async def get_index():
         raise
 
 @starter.get("/users", response_model=List[schemas.UserResponse])
+@cached(cache)
 async def get_users(db: Session = Depends(get_db)):
     try:
         users = db.query(Users).all()
@@ -79,6 +79,7 @@ async def get_users(db: Session = Depends(get_db)):
 
 
 @starter.get("/users/{id}", response_model=schemas.UserResponse)
+@cached(cache)
 async def get_user(id: int, db: Session = Depends(get_db)):
     try:
         user = db.query(Users).filter(Users.id == id).first()
@@ -99,6 +100,7 @@ async def get_user(id: int, db: Session = Depends(get_db)):
         raise
 
 @starter.put("/users/{id}", response_model=schemas.UserResponse)
+@cached(cache)
 async def edit_profile(id: int, user_data: schemas.UpdateRequest, db: Session = Depends(get_db)):
     try:
         user = db.query(Users).filter(Users.id == id).first()
@@ -126,6 +128,7 @@ async def edit_profile(id: int, user_data: schemas.UpdateRequest, db: Session = 
 
 
 @starter.get("/api-key/{api_key}")
+@cached(cache)
 async def get_api_key(api_key: str = Path(...), db: Session = Depends(get_db)):
     try:
         print(f"Received API key: {api_key}")
@@ -137,11 +140,12 @@ async def get_api_key(api_key: str = Path(...), db: Session = Depends(get_db)):
         return {"api_key": user.api_key}
 
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
         raise
 
 
 @starter.post("/api-key/{api_key}")
+@cached(cache)
 async def api(api_key: str = Path(...), db: Session = Depends(get_db)):
     try:
         print(f"Received API key: {api_key}")
@@ -158,6 +162,7 @@ async def api(api_key: str = Path(...), db: Session = Depends(get_db)):
 
 
 @starter.get("/regions")
+@cached(cache)
 async def get_regions(db: Session = Depends(get_db)):
     try:
         regions = db.query(Region).all()
@@ -169,6 +174,7 @@ async def get_regions(db: Session = Depends(get_db)):
 
 
 @starter.get("/regions/{region_id}", response_model=RegionDetail)
+@cached(cache)
 async def get_region(region_id: int, db: Session = Depends(get_db)):
     try:
         region = db.query(Region).filter(Region.region_id == region_id).first()
@@ -191,6 +197,7 @@ async def get_region(region_id: int, db: Session = Depends(get_db)):
 
 
 @starter.get("/regions/region/{regionSearch}", response_model=RegionDetail)
+@cached(cache)
 async def get_region_by_name(regionSearch: str, db: Session = Depends(get_db)):
     try:
         name = regionSearch.capitalize()
@@ -214,6 +221,7 @@ async def get_region_by_name(regionSearch: str, db: Session = Depends(get_db)):
 
 
 @starter.get("/states")
+@cached(cache)
 async def get_states(db: Session = Depends(get_db)):
     try:
         states = db.query(State).all()
@@ -225,6 +233,7 @@ async def get_states(db: Session = Depends(get_db)):
 
 
 @starter.get("/states/{state_id}", response_model=StateDetail)
+@cached(cache)
 async def get_state(state_id: int, db: Session = Depends(get_db)):
     try:
         state = (
@@ -250,6 +259,7 @@ async def get_state(state_id: int, db: Session = Depends(get_db)):
 
 
 @starter.get("/states/state/{stateSearch}", response_model=StateDetail)
+@cached(cache)
 async def get_state_by_name(stateSearch: str, db: Session = Depends(get_db)):
     try:
         name = stateSearch.capitalize()
@@ -275,6 +285,7 @@ async def get_state_by_name(stateSearch: str, db: Session = Depends(get_db)):
 
 
 @starter.get("/lgas")
+@cached(cache)
 async def get_lgas(db: Session = Depends(get_db)):
     try:
         lgas = db.query(LGA).all()
@@ -285,6 +296,7 @@ async def get_lgas(db: Session = Depends(get_db)):
 
 
 @starter.get("/lgas/{lga_id}")
+@cached(cache)
 async def get_lga(lga_id: int, db: Session = Depends(get_db), user: Users = Depends(get_current_user)):
     try:
         lga = db.query(LGA).filter(LGA.lga_id == lga_id).first()
@@ -297,6 +309,7 @@ async def get_lga(lga_id: int, db: Session = Depends(get_db), user: Users = Depe
 
 
 @starter.get("/cities")
+@cached(cache)
 async def get_cities(db: Session = Depends(get_db)):
     try:
         cities = (
@@ -325,6 +338,7 @@ async def get_cities(db: Session = Depends(get_db)):
 
 
 @starter.get("/cities/{city_id}")
+@cached(cache)
 async def get_city(city_id: int, db: Session = Depends(get_db)):
     try:
         city = db.query(City).get(city_id)
@@ -384,7 +398,7 @@ async def register_user(user_request: RegistrationRequest, db: Session = Depends
         }
 
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
         db.rollback()
         raise
 
@@ -414,7 +428,7 @@ async def login_user(user_request: LoginRequest, db: Session = Depends(get_db)):
         })
             
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
         raise
 
 
