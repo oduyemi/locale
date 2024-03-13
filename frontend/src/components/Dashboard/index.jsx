@@ -17,6 +17,9 @@ export const DashboardContent = () => {
     const [regionSearch, setRegionSearch] = useState("");
     const [statePopupOpen, setStatePopupOpen] = useState(false);
     const [stateSearch, setStateSearch] = useState("");
+    const [stateDetail, setStateDetail] = useState(null); 
+    const [regionDetail, setRegionDetail] = useState(null); 
+    const [loading, setLoading] = useState(false);
     const [flashMessage, setFlashMessage] = useState(null);    
     
     
@@ -42,15 +45,14 @@ export const DashboardContent = () => {
                 type: "error",
                 message: "Failed to fetch regions. Please try again later.",
             });
+          }
+        };
+          fetchRegions();
         }
-    };
-
-      fetchRegions();
-    }
-  }, [user]);
+      }, [user]);
   
-  useEffect(() => {
-    const fetchStates = async () => {
+      useEffect(() => {
+        const fetchStates = async () => {
         try {
             const response = await axios.get("http://localhost:8000/states");
                 setStates(response.data);         
@@ -62,52 +64,91 @@ export const DashboardContent = () => {
                 type: "error",
                 message: "Failed to fetch states. Please try again later.",
             });
-        }
-    };
+          }
+        };
+          fetchStates();
+        }, []); 
 
-    fetchStates();
-  }, []); 
-
-  useEffect(() => {
-    const fetchLgas = async () => {
-        try {
+        useEffect(() => {
+          const fetchLgas = async () => {
+          try {
             const response = await axios.get("http://localhost:8000/lgas");
                 setLgas(response.data);         
 
-        } catch (error) {
+          } catch (error) {
             console.error("Error fetching local government areas:", error);
-
             setFlashMessage({
                 type: "error",
                 message: "Failed to fetch local government areas. Please try again later.",
-            });
+              });
+            }
+          };
+            fetchLgas();
+          }, []); 
+
+              //  POP-UP
+          const handleRegionSearch = () => {
+            setRegionPopupOpen(true);
+          };
+
+          const handleRegionPopupClose = () => {
+            setRegionPopupOpen(false);
+          };
+
+
+          const handleStateSearch = () => {
+            setStatePopupOpen(true);
+          };
+
+          const handleStatePopupClose = () => {
+            setStatePopupOpen(false);
+          };
+
+          const handleSearchState = async () => {
+            if (stateSearch.trim() === "") {
+                setFlashMessage({
+                    type: "error",
+                    message: "Please enter a state name.",
+                });
+                return;
+            }
+    
+            try {
+              const response = await axios.get(`http://localhost:8000/states/state/${encodeURIComponent(stateSearch)}`);
+              localStorage.setItem('stateDetail', JSON.stringify(response.data));
+              setStateDetail(response.data);
+              setLoading(false);
+            } catch (error) {
+              setLoading(false);
+              setFlashMessage({
+                  type: "error",
+                  message: "Failed to fetch state details. Please try again later.",
+              });
+          }   
         }
-    };
-
-    fetchLgas();
-  }, []); 
-
-      //  POP-UP
-      const handleRegionPopupOpen = () => {
-        setRegionPopupOpen(true);
+          const handleSearchRegion = async () => {
+            if (regionSearch.trim() === "") {
+                setFlashMessage({
+                    type: "error",
+                    message: "Please enter a region name.",
+                });
+                return;
+            }
+    
+            try {
+              const response = await axios.get(`http://localhost:8000/regions/region/${encodeURIComponent(regionSearch)}`);
+              localStorage.setItem('regionDetail', JSON.stringify(response.data));
+              setRegionDetail(response.data);
+              setLoading(false);
+            } catch (error) {
+              setLoading(false);
+              setFlashMessage({
+                  type: "error",
+                  message: "Failed to fetch region details. Please try again later.",
+              });  
+            }
         };
-
-      const handleRegionPopupClose = () => {
-        setRegionPopupOpen(false);
-      };
-
-      const handleStatePopupOpen = () => {
-        setStatePopupOpen(true);
-        };
-
-
-      const handleStateSearch = () => {
-        setStatePopupOpen(true);
-      };
-
-      const handleStatePopupClose = () => {
-        setStatePopupOpen(false);
-      };
+    
 
   return(
     <div className="container pt-5">
@@ -135,34 +176,17 @@ export const DashboardContent = () => {
                         onChange={(e) => setRegionSearch(e.target.value)}
                       />
                         <span>
+                          <button>
                           <SearchCircleOutline
                             className="margin-auto"
                             color={"#20c997"}
                             height="32px"
                             width="32px"
-                            onClick={handleRegionPopupOpen}
+                            onClick={handleRegionSearch}
                           />
+                          </button>
                         </span>
                       </label>
-                        <Modal
-                          isOpen={regionPopupOpen}
-                          onRequestClose={handleRegionPopupClose}
-                          style={{
-                          overlay: {
-                              backgroundColor: "rgba(0, 0, 0, 0.7)",
-                          },
-                          content: {
-                              top: "50%",
-                              left: "50%",
-                              right: "auto",
-                              bottom: "auto",
-                              marginRight: "-50%",
-                              transform: "translate(-50%, -50%)",
-                              background: "white",
-                          },
-                          }}
-                        >
-                        </Modal>
                     </div>
                   </form>
                 </div>
@@ -182,44 +206,46 @@ export const DashboardContent = () => {
               <h3 className="card-title text-center">States</h3>
               <div className="upped">
               <form className="probootstrap-form bg-transparent">
-                                    <div className="form-group mx-auto">
-                                        <label htmlFor="stateSearch">
-                                            <input
-                                                type="search"
-                                                name="stateSearch"
-                                                placeholder="Search State"
-                                                className="px-auto mx-auto"
-                                                value={stateSearch}
-                                                onChange={(e) => setStateSearch(e.target.value)}
-                                            />
-                                            <span>
-                                                <SearchCircleOutline
-                                                    className="margin-auto"
-                                                    color={"#20c997"}
-                                                    height="32px"
-                                                    width="32px"
-                                                    onClick={handleStateSearch}
-                                                />
-                                            </span>
-                                        </label>
-                                    </div>
-                                </form>
-                            </div>
-                            <div className="upper">
-                                {states.map((state) => (
-                                    <div className="row" key={state.id}>
-                                        <div className="col">
-                                            <p className="card-text">
-                                                {state.state_id}. &emsp; State: {state.state_name}
-                                            </p>
-                                        </div>
-                                        <div className="col">
-                                            <p className="card-text">
-                                                Capital: {state.state_capital}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
+                <div className="form-group mx-auto">
+                  <label htmlFor="stateSearch">
+                    <input
+                        type="search"
+                        name="stateSearch"
+                        placeholder="Search State"
+                        className="px-auto mx-auto"
+                        value={stateSearch}
+                        onChange={(e) => setStateSearch(e.target.value)}
+                    />
+                    <span>
+                      <button className="">
+                        <SearchCircleOutline
+                            className="margin-auto"
+                            color={"#20c997"}
+                            height="32px"
+                            width="32px"
+                            onClick={handleStateSearch}
+                          />
+                      </button>
+                    </span>
+                  </label>
+                </div>
+            </form>
+        </div>
+        <div className="upper">
+            {states.map((state) => (
+                <div className="row" key={state.id}>
+                    <div className="col">
+                        <p className="card-text">
+                            {state.state_id}. &emsp; State: {state.state_name}
+                        </p>
+                    </div>
+                    <div className="col">
+                        <p className="card-text">
+                            Capital: {state.state_capital}
+                        </p>
+                    </div>
+                </div>
+            ))}
                             </div>  
                         </div>
                     </div>
@@ -240,8 +266,7 @@ export const DashboardContent = () => {
           </div>
         </div>
       </div>
-
-        <RegionSearchPopup open={regionPopupOpen} onClose={handleRegionPopupClose} />
+      <RegionSearchPopup open={regionPopupOpen} onClose={handleRegionPopupClose} />
       </div>
     )
 }

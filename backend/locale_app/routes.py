@@ -162,7 +162,6 @@ async def api(api_key: str = Path(...), db: Session = Depends(get_db)):
 
 
 @starter.get("/regions")
-@cached(cache)
 async def get_regions(db: Session = Depends(get_db)):
     try:
         regions = db.query(Region).all()
@@ -215,13 +214,12 @@ async def get_region_by_name(regionSearch: str, db: Session = Depends(get_db)):
             raise HTTPException(status_code=404, detail="The region does not exist.")
 
     except Exception as e:
-        logger.error(f"Error: {e}")
+        print(f"Error: {e}")
         raise
 
 
 
 @starter.get("/states")
-@cached(cache)
 async def get_states(db: Session = Depends(get_db)):
     try:
         states = db.query(State).all()
@@ -259,7 +257,6 @@ async def get_state(state_id: int, db: Session = Depends(get_db)):
 
 
 @starter.get("/states/state/{stateSearch}", response_model=StateDetail)
-@cached(cache)
 async def get_state_by_name(stateSearch: str, db: Session = Depends(get_db)):
     try:
         name = stateSearch.capitalize()
@@ -285,7 +282,6 @@ async def get_state_by_name(stateSearch: str, db: Session = Depends(get_db)):
 
 
 @starter.get("/lgas")
-@cached(cache)
 async def get_lgas(db: Session = Depends(get_db)):
     try:
         lgas = db.query(LGA).all()
@@ -309,7 +305,6 @@ async def get_lga(lga_id: int, db: Session = Depends(get_db), user: Users = Depe
 
 
 @starter.get("/cities")
-@cached(cache)
 async def get_cities(db: Session = Depends(get_db)):
     try:
         cities = (

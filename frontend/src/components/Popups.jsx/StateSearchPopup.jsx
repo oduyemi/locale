@@ -1,28 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
-import axios from "axios";
 
 export const StateSearchPopup = ({ open, onClose }) => {
     const [stateDetail, setStateDetail] = useState(null);
-    const [stateSearch, setStateSearch] = useState("");
     const [loading, setLoading] = useState(false);
-    const [flashMessage, setFlashMessage] = useState(null);
+    const [flashMessage, setFlashMessage] = useState(null); 
 
-    const handleSearch = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`http://localhost:8000/states/state/${stateSearch}`);
-            setStateDetail(response.data);
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-            setFlashMessage({
-                type: "error",
-                message: "Failed to fetch state details. Please try again later.",
-            });
-        }
-    };
-
+    useEffect(() => {
+        const storedStateDetail = JSON.parse(localStorage.getItem('stateDetail'));
+        setStateDetail(storedStateDetail);
+    }, []);
     return (
         <Modal
             isOpen={open}
@@ -39,7 +26,6 @@ export const StateSearchPopup = ({ open, onClose }) => {
                     marginRight: "-50%",
                     transform: "translate(-50%, -50%)",
                 },
-                className: "modal",
             }}
         >
             <p className="close text-[#EE964B]" onClick={onClose}> X </p>
@@ -47,18 +33,24 @@ export const StateSearchPopup = ({ open, onClose }) => {
                 <div position="relative" paddingTop="6.25%">
                     <div className="popup">
                         <div className="popup-content">
-                            {loading ? (
-                                <p>Loading...</p>
-                            ) : (
-                                stateDetail !== null && (
+                            {stateDetail !== null && (
                                     <div>
-                                        <h3 className="text-sucesss"><strong>{stateDetail.state_name}</strong></h3>
+                                        <h3 className="text-success"><strong>{stateDetail.state_name}</strong></h3>
                                         <p><strong>Region:</strong> {stateDetail.region_name}</p>
-                                        <p><strong>Local Government Areas:</strong> {stateDetail.lgas.join(", ")}</p>
-                                        <p><strong>Cities:</strong> {stateDetail.cities.join(", ")}</p>
+                                        <ul>
+                                            {stateDetail.lgas.map((lga, index) => (
+                                                <li key={index} style={{ listStyle:"none" }}>{lga}</li>
+                                            ))}
+                                        </ul>
+                                        <p><strong>Cities:</strong></p>
+                                        <ul>
+                                            {stateDetail.cities.map((city, index) => (
+                                                <li key={index} style={{ listStyle:"none" }}>{city}</li>
+                                            ))}
+                                        </ul>
                                     </div>
                                 )
-                            )}
+                            }
                             {flashMessage && (
                                 <div className={`flash-message ${flashMessage.type}`}>
                                     {flashMessage.message}

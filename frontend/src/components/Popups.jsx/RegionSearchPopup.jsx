@@ -3,41 +3,13 @@ import Modal from "react-modal";
 import axios from "axios";
 
 export const RegionSearchPopup = ({ open, onClose }) => {
-    const [region, setRegion] = useState(null);
-    const [regionSearch, setRegionSearch] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [flashMessage, setFlashMessage] = useState(null);
-
-    const fetchRegion = async () => {
-        try {
-            if (!regionSearch.trim()) {
-                setFlashMessage({
-                    type: "error",
-                    message: "Please enter a valid state name.",
-                });
-                return;
-            }
-            setLoading(true);
-            const response = await axios.get(`http://localhost:8000/states/${regionSearch}`);
-            setRegion(response.data);
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching state:", error);
-            setFlashMessage({
-                type: "error",
-                message: "Failed to fetch state. Please try again later.",
-            });
-            setLoading(false);
-        }
-    };
+    const [regionDetail, setRegionDetail] = useState(null);
+    const [flashMessage, setFlashMessage] = useState(null); 
 
     useEffect(() => {
-        if (regionSearch !== "") {
-            fetchRegion();
-        } else {
-            setRegion(null);
-        }
-    }, [regionSearch]);
+        const storedRegionDetail = JSON.parse(localStorage.getItem('regionDetail'));
+        setRegionDetail(storedRegionDetail);
+    }, []);
 
     return (
         <Modal
@@ -63,22 +35,29 @@ export const RegionSearchPopup = ({ open, onClose }) => {
                 <div position="relative" paddingTop="6.25%">
                     <div className="popup">
                         <div className="popup-content mt-5 pt-5">
-                            <ul>
-                                {region && region.map(region => (
-                                        <li 
-                                            key={region.region_id}
-                                            style={{ listStyle: "none" }}
-                                        >
-                                            {region.region_id}. &emsp;
-                                            <span className="text-success"><b>{region.region_name}</b></span>
-                                            <br/>
-                                            &emsp; &emsp;<b>States</b>: {" "} 
-                                            {region.region_states && region.region_states.replace(/[{}]/g, "").split(',').map((state, index) => (
-                                                <span key={index}>{state.trim()} {index < region.region_states.split(',').length - 1 ? ', ' : ''}</span>
-                                        ))}
-                                    </li>
-                                    ))}
-                            </ul>
+                            {regionDetail !== null && (
+                                    <div>
+                                        <h3 className="text-success"><strong>{regionDetail.region_name}</strong></h3>
+                                        <p><strong>State:</strong> {regionDetail.state_names}</p>
+                                        <ul>
+                                            {regionDetail.state_names.map((state_name, index) => (
+                                                <li key={index} style={{ listStyle:"none" }}>{state_name}</li>
+                                            ))}
+                                        </ul>
+                                        <p><strong>Cities:</strong></p>
+                                        <ul>
+                                            {regionDetail.cities.map((city, index) => (
+                                                <li key={index} style={{ listStyle:"none" }}>{city}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )
+                            }
+                            {flashMessage && (
+                                <div className={`flash-message ${flashMessage.type}`}>
+                                    {flashMessage.message}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
