@@ -10,7 +10,7 @@ export const RegionsPopUp = ({ open, onClose }) => {
     useEffect(() => {
         const fetchRegions = async () => {
           try {
-              const response = await axios.get("http://localhost:8000/regions");
+              const response = await axios.get("https://locale-4z2n.onrender.com/regions");
                   setRegions(response.data);
   
               } catch (error) {

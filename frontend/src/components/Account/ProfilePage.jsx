@@ -45,7 +45,7 @@ export const ProfilePage = () => {
 
     const updateUserData = async () => {
         try {
-            const response = await axios.put(`http://localhost:8000/users/${user.id}`, {
+            const response = await axios.put(`https://locale-4z2n.onrender.com/users/${user.id}`, {
                 fname: userDetails.fname,
                 lname: userDetails.lname,
                 email: userDetails.email

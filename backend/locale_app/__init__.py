@@ -11,7 +11,7 @@ starter = FastAPI(title="Locale", description="Know Nigeria by the roads!")
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://locale.onrender.com",
+    "locale-eta.vercel.app",
 ]
 
 starter.add_middleware(

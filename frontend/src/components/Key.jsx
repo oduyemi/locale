@@ -13,7 +13,7 @@ export const Key = () => {
         e.preventDefault();
         
         try {
-            const response = await axios.post(`http://localhost:8000/api-key/${apiKey}`);
+            const response = await axios.post(`https://locale-4z2n.onrender.com/api-key/${apiKey}`);
             if (response.status === 200) {
                 localStorage.setItem("apiKey", apiKey);
                 setFlashMessage({

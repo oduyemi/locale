@@ -20,7 +20,7 @@ export const Banner = () => {
     const handleSubmit = async (e) => {
         e.preventDefault(); 
         try {
-            const apiKeyValidationResponse = await axios.post(`http://localhost:8000/api-key/${formData.api_key}`, null, {
+            const apiKeyValidationResponse = await axios.post(`https://locale-4z2n.onrender.com/api-key/${formData.api_key}`, null, {
             headers: { "Content-Type": "application/json" }
             });
 
@@ -35,19 +35,19 @@ export const Banner = () => {
             let url;
             let filename;
             if (formData.data === "regions") {
-                const response = await axios.get("http://localhost:8000/regions");
+                const response = await axios.get("https://locale-4z2n.onrender.com/regions");
                 setData(response.data);
                 filename = "regions.json";
                 url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)], { type: "application/json" }));
     
             } else if (formData.data === "states") {
-                const response = await axios.get("http://localhost:8000/states");
+                const response = await axios.get("https://locale-4z2n.onrender.com/states");
                 setData(response.data);
                 filename = "states.json";
                 url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)], { type: "application/json" }));
     
             } else if (formData.data === "lgas") {
-                const response = await axios.get("http://localhost:8000/lgas");
+                const response = await axios.get("https://locale-4z2n.onrender.com/lgas");
                 setData(response.data);
                 filename = "lgas.json";
                 url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data)], { type: "application/json" }));

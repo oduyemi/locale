@@ -30,7 +30,7 @@ export const RegisterForm = () => {
                 throw new Error("Passwords must match!");
             }
     
-            const response = await axios.post("http://localhost:8000/register", formData, {
+            const response = await axios.post("https://locale-4z2n.onrender.com/register", formData, {
                 headers: { "Content-Type": "application/json" }
             });
     

@@ -35,7 +35,7 @@ export const DashboardContent = () => {
       } else {
       const fetchRegions = async () => {
         try {
-            const response = await axios.get("http://localhost:8000/regions");
+            const response = await axios.get("https://locale-4z2n.onrender.com/regions");
                 setRegions(response.data);
 
             } catch (error) {
@@ -54,7 +54,7 @@ export const DashboardContent = () => {
       useEffect(() => {
         const fetchStates = async () => {
         try {
-            const response = await axios.get("http://localhost:8000/states");
+            const response = await axios.get("https://locale-4z2n.onrender.com/states");
                 setStates(response.data);         
 
         } catch (error) {
@@ -72,7 +72,7 @@ export const DashboardContent = () => {
         useEffect(() => {
           const fetchLgas = async () => {
           try {
-            const response = await axios.get("http://localhost:8000/lgas");
+            const response = await axios.get("https://locale-4z2n.onrender.com/lgas");
                 setLgas(response.data);         
 
           } catch (error) {
@@ -114,7 +114,7 @@ export const DashboardContent = () => {
             }
     
             try {
-              const response = await axios.get(`http://localhost:8000/states/state/${encodeURIComponent(stateSearch)}`);
+              const response = await axios.get(`https://locale-4z2n.onrender.com/states/state/${encodeURIComponent(stateSearch)}`);
               localStorage.setItem('stateDetail', JSON.stringify(response.data));
               setStateDetail(response.data);
               setLoading(false);
@@ -136,7 +136,7 @@ export const DashboardContent = () => {
             }
     
             try {
-              const response = await axios.get(`http://localhost:8000/regions/region/${encodeURIComponent(regionSearch)}`);
+              const response = await axios.get(`https://locale-4z2n.onrender.com/regions/region/${encodeURIComponent(regionSearch)}`);
               localStorage.setItem('regionDetail', JSON.stringify(response.data));
               setRegionDetail(response.data);
               setLoading(false);

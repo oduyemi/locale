@@ -14,7 +14,7 @@ export const UserProvider = ({ children }) => {
 
   const handleLogin = async (email, pwd) => {
     try {
-      const response = await axios.post("http://localhost:8000/login", { email, pwd });
+      const response = await axios.post("https://locale-4z2n.onrender.com/login", { email, pwd });
   
       if (response.status === 200) {
         console.log("Success:", response.data);
