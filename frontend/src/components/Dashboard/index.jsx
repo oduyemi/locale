@@ -163,7 +163,7 @@ export const DashboardContent = () => {
           <div className="card card-body bg-transparent shadow">
             <div className="scroll-card card-body dashboard-main">
                 <h3 className="card-title pushUp text-center">Regions</h3>
-                {/* <div className="upped mx-auto">
+                <div className="upped mx-auto">
                   <form className="probootstrap-form bg-transparent">
                     <div className="form-group mx-auto">   
                       <label htmlFor="region_name">
@@ -189,7 +189,7 @@ export const DashboardContent = () => {
                       </label>
                     </div>
                   </form>
-                </div> */}
+                </div>
                 <div className="upper"> 
                   {regions.map(region => (
                     <p key={region.id} className="card-text">
@@ -204,7 +204,7 @@ export const DashboardContent = () => {
           <div className="card text-white bg-transparent shadow">
             <div className="scroll-card card-body dashboard-maine">
               <h3 className="card-title text-center">States</h3>
-              {/* <div className="upped">
+              <div className="upped">
               <form className="probootstrap-form bg-transparent">
                 <div className="form-group mx-auto">
                   <label htmlFor="stateSearch">
@@ -230,7 +230,7 @@ export const DashboardContent = () => {
                   </label>
                 </div>
             </form>
-        </div> */}
+        </div>
         <div className="upper">
             {states.map((state) => (
                 <div className="row" key={state.id}>
