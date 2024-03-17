@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
 import { RegionsPopUp } from "../Popups.jsx/RegionsPopup";
+import { Eye, EyeOff } from "react-ionicons";
 import axios from "axios";
 
 
@@ -12,10 +13,15 @@ export const Banner = () => {
     const [flashMessage, setFlashMessage] = useState(null);
     const [formSubmitted, setFormSubmitted] = useState(false);
     const [data, setData] = useState(null);
+    const [showAPI, setShowAPI] = useState(false);
     const [formData, setFormData] = useState({
         data: "",
         api_key: "",        
     });
+
+    const toggleShowAPI = () => {
+        setShowAPI(!showAPI)
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault(); 
@@ -169,16 +175,37 @@ export const Banner = () => {
                     </div>
                   </div>
                     <div className="col-md mx-auto">
-                        <div className="form-group mx-auto">
+                        <div className="form-group mx-auto position-relative">
                             <label htmlFor="api_key" style={{ width: "100%" }}>API key
-                            <input
-                                type="password"
-                                name="api_key"
-                                className="form-control"
-                                style={{ backgroundColor:"transparent"}}
-                                value={formData.api_key}
-                                onChange={(e) => setFormData({ ...formData, api_key: e.target.value })}
-                            />
+                            <div className="d-flex align-items-center">
+                                <input
+                                    type={showAPI ? "text" : "password"} 
+                                    name="api_key"
+                                    className="form-control text-light"
+                                    style={{ backgroundColor:"transparent"}}
+                                    value={formData.api_key}
+                                    onChange={(e) => setFormData({ ...formData, api_key: e.target.value })}
+                                />
+                                <button 
+                                        type="button" 
+                                        className="position-absolute end-0 px-auto mt-2 d-inline bg-success" 
+                                        style={{ top: "50%", transform: "translateY(-50%)" }}
+                                        onClick={toggleShowAPI}
+                                    >
+                                        {showAPI ? 
+                                            <Eye
+                                                color={"#ffffff"}
+                                                height="30px"
+                                                width="30px" 
+                                            /> :
+                                            <EyeOff 
+                                                color={"#ffffff"}
+                                                height="30px"
+                                                width="30px"
+                                            />
+                                        }
+                                    </button>
+                                </div>
                             </label>
                         </div>
                     </div>
