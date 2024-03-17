@@ -11,8 +11,6 @@ export const RegisterForm = () => {
     const [copied, setCopied] = useState(false);
     const [flashMessage, setFlashMessage] = useState(null);
     const [formSubmitted, setFormSubmitted] = useState(false);
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formData, setFormData] = useState({
@@ -248,5 +246,5 @@ export const RegisterForm = () => {
                     </div>
             </form></div>
         </div>
-    )
-}
+    );
+};

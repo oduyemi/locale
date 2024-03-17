@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
+import { LoginForm } from "../../components/Login";
 import { Footer } from "../../components/Footer";
-import { LoginForm } from "../../components/Login"
+
 
 
 const Login = () => {
