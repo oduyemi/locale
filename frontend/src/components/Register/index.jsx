@@ -110,7 +110,7 @@ export const RegisterForm = () => {
                             <input 
                                 type="text" 
                                 name="fname" 
-                                className="form-control bg-transparent disabled placeholder" 
+                                className="form-control bg-transparent text-light disabled placeholder" 
                                 placeholder="Your First Name" 
                                 value={formData.fname} 
                                 onChange={handleChange} 
@@ -125,7 +125,7 @@ export const RegisterForm = () => {
                             <input 
                                 type="text" 
                                 name="lname" 
-                                className="form-control bg-transparent disabled placeholder" 
+                                className="form-control bg-transparent text-light disabled placeholder" 
                                 placeholder="Your Last Name"
                                 value={formData.lname} 
                                 onChange={handleChange}
@@ -143,7 +143,7 @@ export const RegisterForm = () => {
                                 <input 
                                     type="email" 
                                     name="email" 
-                                    className="form-control bg-transparent disabled placeholder" 
+                                    className="form-control bg-transparent text-light disabled placeholder" 
                                     placeholder="Your Email Address"
                                     value={formData.email}
                                     onChange={handleChange}
@@ -161,7 +161,7 @@ export const RegisterForm = () => {
                             <input 
                                 type="password" 
                                 name="pwd"
-                                className="form-control bg-transparent disabled placeholder" 
+                                className="form-control bg-transparent text-light disabled placeholder" 
                                 placeholder="Create Your Password" 
                                 value={formData.pwd}
                                 onChange={handleChange}
@@ -188,9 +188,9 @@ export const RegisterForm = () => {
                     <div className="col-md text-center">
                         <input type="submit" value="Register" className="btn btn-success btn-block" />
                     </div>
-                    <div class="text-center my-3">
-                        <span class="text-light" style={{ fontSize: "smaller" }}>Already Have An Account? &nbsp; 
-                            <Link class="text-warning" to="/login" style={{ textDecoration: "none" }}>Click Here</Link>
+                    <div className="text-center my-3">
+                        <span className="text-light" style={{ fontSize: "smaller" }}>Already Have An Account? &nbsp; 
+                            <Link className="text-warning" to="/login" style={{ textDecoration: "none" }}>Click Here</Link>
                         </span>
                     </div>
             </form></div>

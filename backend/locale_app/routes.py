@@ -1,10 +1,8 @@
-import os, time, bcrypt, hashlib, logging, requests
+import bcrypt, hashlib, logging
 from datetime import datetime
 from fastapi import APIRouter, Request, status, Depends, HTTPException, Path
 from fastapi.responses import JSONResponse
-from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
-from cachetools import TTLCache, cached
 from locale_app import starter, models, schemas
 from passlib.context import CryptContext
 from typing import Optional, List
@@ -14,16 +12,11 @@ from locale_app.database import SessionLocal
 from .auth import create_access_token, verify_token, authenticate_user
 from locale_app.dependencies import get_db, get_user_from_session, get_current_user, create_jwt_token, get_token
 from .dependencies import get_db
-from instance.config import SECRET_KEY, DATABASE_URI
-from dotenv import load_dotenv
 from .utils import generate_api_key
 
 
-load_dotenv()
-
 
 locale_router = APIRouter()
-cache = TTLCache(maxsize=100, ttl=300)
 logger = logging.getLogger(__name__)
 
 
@@ -53,25 +46,22 @@ async def get_index():
         logger.error(f"Error: {e}")
         raise
 
-@starter.get("/users", response_model=List[schemas.UserResponse])
-@cached(cache)
+@starter.get("/users", response_model=list[schemas.UserResponse])
 async def get_users(db: Session = Depends(get_db)):
     try:
-        users = db.query(Users).all()
-
+        users = db.query(models.Users).all()
         if not users:
             raise HTTPException(status_code=404, detail="Users not available!")
 
         user_responses = [
-            UserResponse(
-                id = user.id,
-                fname = user.fname,
-                lname = user.lname,
-                email = user.email,
+            schemas.UserResponse(
+                id=user.id,
+                fname=user.fname,
+                lname=user.lname,
+                email=user.email,
             )
             for user in users
         ]
-
         return user_responses
     except Exception as e:
         logger.error(f"Error: {e}")
@@ -79,7 +69,6 @@ async def get_users(db: Session = Depends(get_db)):
 
 
 @starter.get("/users/{id}", response_model=schemas.UserResponse)
-@cached(cache)
 async def get_user(id: int, db: Session = Depends(get_db)):
     try:
         user = db.query(Users).filter(Users.id == id).first()
@@ -91,7 +80,7 @@ async def get_user(id: int, db: Session = Depends(get_db)):
             fname = user.fname,
             lname = user.lname,
             email = user.email,
-            hashedpwd = user.hashedPwd
+            hashedpwd = user.hashedpwd
         )
 
         return user_response
@@ -100,7 +89,6 @@ async def get_user(id: int, db: Session = Depends(get_db)):
         raise
 
 @starter.put("/users/{id}", response_model=schemas.UserResponse)
-@cached(cache)
 async def edit_profile(id: int, user_data: schemas.UpdateRequest, db: Session = Depends(get_db)):
     try:
         user = db.query(Users).filter(Users.id == id).first()
@@ -128,7 +116,6 @@ async def edit_profile(id: int, user_data: schemas.UpdateRequest, db: Session = 
 
 
 @starter.get("/api-key/{api_key}")
-@cached(cache)
 async def get_api_key(api_key: str = Path(...), db: Session = Depends(get_db)):
     try:
         print(f"Received API key: {api_key}")
@@ -145,7 +132,6 @@ async def get_api_key(api_key: str = Path(...), db: Session = Depends(get_db)):
 
 
 @starter.post("/api-key/{api_key}")
-@cached(cache)
 async def api(api_key: str = Path(...), db: Session = Depends(get_db)):
     try:
         print(f"Received API key: {api_key}")
@@ -161,10 +147,11 @@ async def api(api_key: str = Path(...), db: Session = Depends(get_db)):
         raise
 
 
-@starter.get("/regions")
+@starter.get("/regions", response_model=list[schemas.RegionDetail])
 async def get_regions(db: Session = Depends(get_db)):
     try:
-        regions = db.query(Region).all()
+        regions = db.query(models.Region).all()
+
         return regions
 
     except Exception as e:
@@ -173,7 +160,6 @@ async def get_regions(db: Session = Depends(get_db)):
 
 
 @starter.get("/regions/{region_id}", response_model=RegionDetail)
-@cached(cache)
 async def get_region(region_id: int, db: Session = Depends(get_db)):
     try:
         region = db.query(Region).filter(Region.region_id == region_id).first()
@@ -196,7 +182,6 @@ async def get_region(region_id: int, db: Session = Depends(get_db)):
 
 
 @starter.get("/regions/region/{regionSearch}", response_model=RegionDetail)
-@cached(cache)
 async def get_region_by_name(regionSearch: str, db: Session = Depends(get_db)):
     try:
         name = regionSearch.capitalize()
@@ -219,10 +204,11 @@ async def get_region_by_name(regionSearch: str, db: Session = Depends(get_db)):
 
 
 
-@starter.get("/states")
+@starter.get("/states", response_model=list[schemas.StateDetail])
 async def get_states(db: Session = Depends(get_db)):
     try:
-        states = db.query(State).all()
+        states = db.query(models.State).all()
+
         return states
 
     except Exception as e:
@@ -231,7 +217,6 @@ async def get_states(db: Session = Depends(get_db)):
 
 
 @starter.get("/states/{state_id}", response_model=StateDetail)
-@cached(cache)
 async def get_state(state_id: int, db: Session = Depends(get_db)):
     try:
         state = (
@@ -284,15 +269,16 @@ async def get_state_by_name(stateSearch: str, db: Session = Depends(get_db)):
 @starter.get("/lgas")
 async def get_lgas(db: Session = Depends(get_db)):
     try:
-        lgas = db.query(LGA).all()
+        lgas = db.query(models.LGA).all()
+
         return lgas
+
     except Exception as e:
         logger.error(f"Error: {e}")
         raise
 
 
 @starter.get("/lgas/{lga_id}")
-@cached(cache)
 async def get_lga(lga_id: int, db: Session = Depends(get_db), user: Users = Depends(get_current_user)):
     try:
         lga = db.query(LGA).filter(LGA.lga_id == lga_id).first()
@@ -333,7 +319,6 @@ async def get_cities(db: Session = Depends(get_db)):
 
 
 @starter.get("/cities/{city_id}")
-@cached(cache)
 async def get_city(city_id: int, db: Session = Depends(get_db)):
     try:
         city = db.query(City).get(city_id)

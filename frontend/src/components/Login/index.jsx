@@ -79,9 +79,9 @@ export const LoginForm = () => {
                     <div className="col-md text-center">
                         <input type="submit" value="Login" className="btn btn-success btn-block" />
                     </div>
-                    <div class="text-center my-3">
-                        <span class="text-light" style={{ fontSize: "smaller"}}>Don't have an account yet? &nbsp;
-                            <Link class="text-warning" to="/register" style={{ textDecoration: "none" }}>Click Here</Link>
+                    <div className="text-center my-3">
+                        <span className="text-light" style={{ fontSize: "smaller"}}>Don't have an account yet? &nbsp;
+                            <Link className="text-warning" to="/register" style={{ textDecoration: "none" }}>Click Here</Link>
                         </span>
                     </div>
             </form></div>
