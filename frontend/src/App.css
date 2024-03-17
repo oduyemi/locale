@@ -6,43 +6,92 @@
 
 body{
   overflow: hidden;
+  background-color: #000;
 }
 
-body.homepage{
-  background-image: url(assets/images/home.jpg);
+body.homepage {
+  background-image: url("assets/images/home.jpg");
   background-size: cover;
 }
 
 body.loginpage {
-  background-image: url(assets/images/login.jpg);
+  background-image: url("assets/images/login.jpg");
   background-size: cover; 
 }
 
-body.registerpage{
-  background-image: url(assets/images/register.jpg);
+body.registerpage {
+  background-image: url("assets/images/register.jpg");
   background-size: cover;
 }
 
-body.dashboard{
-  background-image: url(assets/images/dashboard.jpg);
+body.dashboard {
+  background-image: url("assets/images/dashboard.jpg");
   background-size: cover;
 }
 
-body.guide{
-  background-image: url(assets/images/city.jpg);
+body.guide {
+  background-image: url("assets/images/city.jpg");
   background-size: cover;
 }
 
-body.profile{
-  background-image: url(assets/images/profile.jpg);
+body.profile {
+  background-image: url("assets/images/profile.jpg");
   background-size: cover;
 }
 
-body.key{
-  background-image: url(assets/images/key.jpg);
+body.key {
+  background-image: url("assets/images/key.jpg");
   background-position-y: 30%;
   background-size: cover;
 }
+
+@media (min-width: 768px) {
+  body.homepage {
+    background-image: url("assets/images/home.jpg");
+  }
+}
+
+@media (max-width: 767px) {
+  body.homepage {
+    background-image: url("assets/images/home_small.jpg");
+  }
+  body.loginpage {
+    background-image: url("assets/images/login_small.jpg");
+  }
+  
+  body.registerpage {
+    background-image: url("assets/images/register_small.jpg");
+  }
+  
+  body.dashboard {
+    background-image: url("assets/images/dashboard_small.jpg");
+  }
+  
+  body.guide {
+    background-image: url("assets/images/city_small.jpg");
+  }
+  
+  body.profile {
+    background-image: url("assets/images/profile_small.jpg");
+  }
+  
+  body.key {
+    background-image: url("assets/images/key_small.jpg");
+  }
+}
+
+.lazyload {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.lazyloaded {
+  opacity: 1;
+}
+
+
+
+
 
 .App{
   height: 100vh;
