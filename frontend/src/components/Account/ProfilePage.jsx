@@ -43,36 +43,39 @@ export const ProfilePage = () => {
             }
         }, []);
 
-    const updateUserData = async () => {
-        try {
-            const response = await axios.put(`https://locale-4z2n.onrender.com/users/${user.id}`, {
-                fname: userDetails.fname,
-                lname: userDetails.lname,
-                email: userDetails.email
-            });
-
-            if (response.status === 200) {
-                console.log("Success:", response.data);
-                setUser(response.data);
-                localStorage.setItem('userDetails', JSON.stringify(userDetails));
-                setFlashMessage({
-                    type: "success",
-                    message: "User details updated successfully!",
-                  });
-            } else {
+        const updateUserData = async () => {
+            try {
+                const response = await axios.put(`https://locale-4z2n.onrender.com/users/${user.id}`, {
+                    fname: userDetails.fname,
+                    lname: userDetails.lname,
+                    email: userDetails.email
+                });
+    
+                if (response.status === 200) {
+                    console.log("Success:", response.data);
+                    setUser(response.data);
+                    localStorage.setItem('userDetails', JSON.stringify(userDetails));
+                    setFlashMessage({
+                        type: "success",
+                        message: "User details updated successfully!",
+                    });
+                    setTimeout(() => {
+                        window.location.href = "/dashboard";
+                    }, 2000);
+                } else {
+                    setFlashMessage({
+                        type: "error",
+                        message: "Failed to update user details",
+                    });
+                }
+            } catch (error) {
+                console.error("Error updating user details:", error);
                 setFlashMessage({
                     type: "error",
-                    message: "Failed to update user details",
-                  });
+                    message: "An error occurred while updating user details",
+                });
             }
-        } catch (error) {
-            console.error("Error updating user details:", error);
-            setFlashMessage({
-                type: "error",
-                message: "An error occurred while updating user details",
-              });
-        }
-    };
+        };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -165,9 +168,6 @@ export const ProfilePage = () => {
                     <div className="p-3 py-5 mx-auto">
                         <div className="d-flex justify-content-between align-items-center">
                             <span><h3>API Key</h3></span>
-                                <span>
-                                    <button className="btn btn-outline-light px-3 p-1">Show/Hide</button>
-                                </span>
                         </div> 
                         <br />
                         <div className="col-md-12">

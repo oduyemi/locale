@@ -111,7 +111,7 @@ export const RegisterForm = () => {
                             )}
                         </div>
                     )}
-                <h2 className="text-center display-5 text-success mt-2">Registration</h2>
+                <h2 className="text-center display-5 mt-2">Registration</h2>
                 <div className="form-group">
                     <div className="row mb-3">
                     <div className="col-md">

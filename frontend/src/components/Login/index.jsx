@@ -40,7 +40,7 @@ export const LoginForm = () => {
         <div className="row mt-5">
             <div className="col-md mt-5">
                 <form onSubmit={handleSubmit} className="probootstrap-form w-50 mx-auto mt-5">
-                    <h2 className="text-center display-5 text-success mt-2">Login</h2>
+                    <h2 className="text-center display-5 mt-2">Login</h2>
                     {formSubmitted && flashMessage && (
                         <div className={`alert ${flashMessage.type === "success" ? "alert-success" : "alert-danger"}`}>
                             {flashMessage.message}
@@ -79,7 +79,7 @@ export const LoginForm = () => {
                                     />
                                     <button 
                                         type="button" 
-                                        className="position-absolute end-0 px-auto mt-2 d-inline bg-success" 
+                                        className="position-absolute end-0 px-auto mt-3 d-inline bg-success" 
                                         style={{ top: "50%", transform: "translateY(-50%)" }}
                                         onClick={toggleShowPassword}
                                     >
@@ -101,7 +101,7 @@ export const LoginForm = () => {
                     </div>
                     <div className="row mb-5">     
                         <div className="col-md text-center">
-                            <input type="submit" value="Login" className="btn btn-success btn-block" />
+                            <input type="submit" value="Login" className="btn btn-success mt-2 btn-block" />
                         </div>
                         <div className="text-center my-3">
                             <span className="text-light" style={{ fontSize: "smaller"}}>Don't have an account yet? &nbsp;
