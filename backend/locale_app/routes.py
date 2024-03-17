@@ -147,11 +147,10 @@ async def api(api_key: str = Path(...), db: Session = Depends(get_db)):
         raise
 
 
-@starter.get("/regions", response_model=list[schemas.RegionDetail])
+@starter.get("/regions")
 async def get_regions(db: Session = Depends(get_db)):
     try:
-        regions = db.query(models.Region).all()
-
+        regions = db.query(Region).all()
         return regions
 
     except Exception as e:
@@ -204,11 +203,10 @@ async def get_region_by_name(regionSearch: str, db: Session = Depends(get_db)):
 
 
 
-@starter.get("/states", response_model=list[schemas.StateDetail])
+@starter.get("/states")
 async def get_states(db: Session = Depends(get_db)):
     try:
-        states = db.query(models.State).all()
-
+        states = db.query(State).all()
         return states
 
     except Exception as e:
@@ -269,10 +267,8 @@ async def get_state_by_name(stateSearch: str, db: Session = Depends(get_db)):
 @starter.get("/lgas")
 async def get_lgas(db: Session = Depends(get_db)):
     try:
-        lgas = db.query(models.LGA).all()
-
+        lgas = db.query(LGA).all()
         return lgas
-
     except Exception as e:
         logger.error(f"Error: {e}")
         raise
