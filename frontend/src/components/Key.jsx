@@ -1,13 +1,20 @@
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { Eye, EyeOff } from "react-ionicons";
 import { UserContext } from "../UserContext";
 
 
 export const Key = () => {
     const [apiKey, setApiKey] = useState("");
+    const [showAPI, setShowAPI] = useState(false);
     const [flashMessage, setFlashMessage] = useState(null);
     const [formSubmitted, setFormSubmitted] = useState(false);
+
+
+    const toggleShowAPI = () => {
+        setShowAPI(!showAPI)
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -50,17 +57,38 @@ export const Key = () => {
                                     {flashMessage?.message}
                                 </div>
                             )}
-                            <div className="mb-2">
-                                <label htmlFor="apiKey" className="form-label">Enter API key</label>
+                            <div className=" mb-2 form-group position-relative">
+                                <label htmlFor="pwd">Enter API key</label>
+                                <div className="d-flex align-items-center">
                                 <input
-                                    type="password"
-                                    className="form-control bg-transparent disabled placeholder"
+                                    type={showAPI ? "text" : "password"} 
+                                    className="form-control bg-transparent text-light disabled placeholder"
                                     id="apiKey"
                                     placeholder="Your API Key"
                                     name="api_key"
                                     value={apiKey}
                                     onChange={(e) => setApiKey(e.target.value)}
                                 />
+                                <button 
+                                        type="button" 
+                                        className="position-absolute end-0 px-auto mt-2 d-inline bg-success" 
+                                        style={{ top: "50%", transform: "translateY(-50%)" }}
+                                        onClick={toggleShowAPI}
+                                    >
+                                        {showAPI ? 
+                                            <Eye
+                                                color={"#ffffff"}
+                                                height="30px"
+                                                width="30px" 
+                                            /> :
+                                            <EyeOff 
+                                                color={"#ffffff"}
+                                                height="30px"
+                                                width="30px"
+                                            />
+                                        }
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="mt-3 mb-2 text-center">
