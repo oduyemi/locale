@@ -46,7 +46,7 @@ export const LoginForm = () => {
                                     <input 
                                         type="email" 
                                         name="email" 
-                                        className="form-control bg-transparent disabled placeholder" 
+                                        className="form-control bg-transparent text-light disabled placeholder" 
                                         placeholder="Your Email Address"
                                         value={formData.email}
                                         onChange={handleChange}
@@ -63,7 +63,7 @@ export const LoginForm = () => {
                                 <input 
                                     type="password" 
                                     name="pwd" 
-                                    className="form-control bg-transparent diasbled placeholder" 
+                                    className="form-control bg-transparent text-light diasbled placeholder" 
                                     placeholder="Your Password" 
                                     value={formData.pwd}
                                     onChange={handleChange}
