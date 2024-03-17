@@ -38,7 +38,7 @@ export const Header = () => {
         <header>
             <nav className="navbar navbar-expand-lg navbar-dark probootstrap_navbar" id="probootstrap-navbar">
                 <div className="container">
-                    <Link className="navbar-brand" to="/">Locale</Link>
+                    <Link className="navbar-brand" id="locale" to="/">Locale</Link>
                     <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#probootstrap-menu" aria-controls="probootstrap-menu" aria-expanded="false" aria-label="Toggle navigation">
                         <span>
                             <Grid

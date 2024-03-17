@@ -39,6 +39,9 @@
   color: #fff !important;
 }
 
+#locale:hover{
+  color: rgba(240, 173, 78);
+}
 
 @media (max-width: 768px) {
   .mobile-menu-button {
