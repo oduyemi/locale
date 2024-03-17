@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { CopyOutline } from "react-ionicons";
 import { Link } from "react-router-dom";
-import axios from "axios"
+import { Eye, EyeOff } from "react-ionicons";
+import axios from "axios";
 
 
 
@@ -10,6 +11,10 @@ export const RegisterForm = () => {
     const [copied, setCopied] = useState(false);
     const [flashMessage, setFlashMessage] = useState(null);
     const [formSubmitted, setFormSubmitted] = useState(false);
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formData, setFormData] = useState({
         fname: "",
         lname: "",
@@ -17,6 +22,14 @@ export const RegisterForm = () => {
         pwd: "",
         cpwd: ""
     });
+
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword)
+    }
+
+    const toggleShowConfirmPassword = () => {
+        setShowConfirmPassword(!showConfirmPassword)
+    }
     
 
     const handleChange = (e) => {
@@ -154,34 +167,74 @@ export const RegisterForm = () => {
                     </div>
             
                     <div className="row mb-5">
+                        <div className="col-md">
+                            <div className="form-group position-relative">
+                                <label htmlFor="pwd">Create Password</label>
+                                <div className="d-flex align-items-center">
+                                    <input 
+                                        type={showPassword ? "text" : "password"} 
+                                        name="pwd" 
+                                        className="form-control bg-transparent text-light disabled placeholder" 
+                                        placeholder="Create Password"
+                                        value={formData.pwd}
+                                        onChange={handleChange}
+                                    />
+                                    <button 
+                                        type="button" 
+                                        className="position-absolute end-0 px-auto mt-2 d-inline bg-success" 
+                                        style={{ top: "50%", transform: "translateY(-50%)" }}
+                                        onClick={toggleShowPassword}
+                                    >
+                                        {showPassword ? 
+                                            <Eye
+                                                color={"#ffffff"}
+                                                height="30px"
+                                                width="30px" 
+                                            /> :
+                                            <EyeOff 
+                                                color={"#ffffff"}
+                                                height="30px"
+                                                width="30px"
+                                            />
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     <div className="col-md">
                         <div className="form-group">
-                        <label htmlFor="pwd">Create Password</label>
-                        <div className="">
-                            <input 
-                                type="password" 
-                                name="pwd"
-                                className="form-control bg-transparent text-light disabled placeholder" 
-                                placeholder="Create Your Password" 
-                                value={formData.pwd}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        </div>
-                    </div>
-                    <div className="col-md">
-                        <div className="form-group">
-                        <label htmlFor="cpwd">Confirm Password</label>
-                        <div className="">
-                            <input 
-                                type="password" 
-                                name="cpwd" 
-                                className="form-control bg-transparent text-light disabled placeholder" 
-                                placeholder="Confirm The Password"
-                                value={formData.cpwd}
-                                onChange={handleChange}
-                            />
-                        </div>
+                            <div className="form-group position-relative">
+                                <label htmlFor="cpwd">Confirm Password</label>
+                                <div className="d-flex align-items-center">
+                                    <input 
+                                        type={showConfirmPassword ? "text" : "password"} 
+                                        name="cpwd" 
+                                        className="form-control bg-transparent text-light disabled placeholder" 
+                                        placeholder="Confirm The Password"
+                                        value={formData.cpwd}
+                                        onChange={handleChange}
+                                    />
+                                    <button 
+                                        type="button" 
+                                        className="position-absolute end-0 px-auto mt-2 d-inline bg-success" 
+                                        style={{ top: "50%", transform: "translateY(-50%)" }}
+                                        onClick={toggleShowConfirmPassword}
+                                    >
+                                        {showConfirmPassword ? 
+                                            <Eye
+                                                color={"#ffffff"}
+                                                height="30px"
+                                                width="30px" 
+                                            /> :
+                                            <EyeOff 
+                                                color={"#ffffff"}
+                                                height="30px"
+                                                width="30px"
+                                            />
+                                        }
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
