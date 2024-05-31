@@ -1,6 +1,11 @@
-# Locale API Documentation
+# Locale
+
+#### Video Demo:  <https://www.youtube.com/watch?si=JK_gk00T2UCqqoUc&v=BooR7_yR1CY&feature=youtu.be>
+
+#### Description:
 
 Welcome to Locale API, your ultimate resource for geographical information about Nigeria! Whether you're a developer building applications for Nigeria's vast population or simply curious about its regions, states, and local government areas (LGAs), Locale API has you covered. This documentation provides an overview of the API endpoints, authentication procedures, and usage guidelines to help you leverage Locale's features effectively.
+
 
 ### Base URL
 
